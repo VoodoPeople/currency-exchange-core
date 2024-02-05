@@ -1,5 +1,9 @@
 # currency-exchange-core
 
+## Development process
+The goal of this repo is to master TDD approach to development.
+ 
+
 ## Measuring Exchange Rates
 
 ### Bilateral exchange rate
@@ -36,3 +40,8 @@ Double isn’t an imprecise number format. It’s extremely precise. It just isn
 ### Two benefits of Decimal:
 You can do precise decimal calculations. e.g. add Double of 0.1 ten times ≠ 1.0 (!)
 You want to enjoy more significant digits. e.g. print Double representation of 12345678901234567890 and it’s not actually 12345678901234567890.
+
+
+### Here I'm using Arlo's notation for micro commits
+ 
+Reference: https://github.com/RefactoringCombos/ArlosCommitNotation
