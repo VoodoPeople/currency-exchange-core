@@ -26,7 +26,11 @@ public struct CurrencyConverter {
     }
 
     public func convert(source: String, target: String, amount: Decimal, interest: Decimal) throws -> Decimal {
-        if let pairRate = try dataSource.retrieve(pair: "\(source)\(target)") {
+        if source != baseCurrency {
+            return try calculateAsCrossCurrency(source: source, target: target, amount: amount, interest: interest)
+        }
+
+        if target != baseCurrency, let pairRate = try dataSource.retrieve(pair: "\(baseCurrency)\(target)") {
             let convrtationDescription = ConvertationDescription(
                 exchangeRate: pairRate,
                 originalAmount: amount,
@@ -34,7 +38,6 @@ public struct CurrencyConverter {
             )
             return try convertationModel.execute(convertation: convrtationDescription)
         }
-
         return try calculateAsCrossCurrency(source: source, target: target, amount: amount, interest: interest)
     }
 
@@ -60,5 +63,9 @@ public struct CurrencyConverter {
         )
 
         return try convertationModel.execute(convertation: convrtationDescription)
+    }
+
+    public func getExchangeRate(source: String, target: String) throws -> ExchangeRate {
+        fatalError("message")
     }
 }

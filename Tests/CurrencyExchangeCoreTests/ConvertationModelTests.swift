@@ -22,7 +22,7 @@ final class ConvertationModelTests: XCTestCase {
         let sut: ConvertationModel = ConvertationModelImpl()
         let result = try sut.execute(convertation: description)
         /*Give take  (+ or -)*/
-        XCTAssertEqual(result, amount * rate + (amount * rate * (interest / 100)))
+        XCTAssertEqual(result, amount * rate - (amount * rate * (interest / 100)))
     }
 
     func test_convertation_model_convertCurrency_sourceToTarget_throws() {

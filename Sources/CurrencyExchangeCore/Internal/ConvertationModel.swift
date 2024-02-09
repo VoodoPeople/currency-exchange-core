@@ -23,6 +23,6 @@ struct ConvertationModelImpl: ConvertationModel {
         
         let originalConvertation = convertation.originalAmount * convertation.sourceToTargetRate
         let percentValue: Decimal = convertation.interest / 100
-        return originalConvertation + (originalConvertation * percentValue)
+        return originalConvertation - (originalConvertation * percentValue)
     }
 }

@@ -10,7 +10,7 @@ import Foundation
 public struct ExchangeRate {
     let source: Currency
     let target: Currency
-    let rateValue: Decimal
+    public let rateValue: Decimal
 
     var pair: String {
         "\(source.code)\(target.code)"

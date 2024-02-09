@@ -24,24 +24,34 @@ struct ExchangeRateRepositoryMock: ExchangeRateDataSource {
 
 class CurrencyConverterTests: XCTestCase {
     func test_currencyConverter_convertStraight() throws {
-        let mockRates = mockRates()
+        let mockRates = mockRates(source: 1, targetRate: 2)
         let dataSource = ExchangeRateRepositoryMock(values: mockRates)
 
         let sut = CurrencyConverter(dataSource: dataSource, baseCurrency: "BASE")
         let convertationResult = try sut.convert(source: "BASE", target: "C1", amount: 2.0, interest: 0.0)
 
-        XCTAssertEqual(convertationResult, 2.4)
+        XCTAssertEqual(convertationResult, 2)
+    }
+
+    func test_currencyConverter_convertInverseTargetToBase() throws {
+        let mockRates = mockRates(source: 1, targetRate: 2)
+        let dataSource = ExchangeRateRepositoryMock(values: mockRates)
+
+        let sut = CurrencyConverter(dataSource: dataSource, baseCurrency: "BASE")
+        let convertationResult = try sut.convert(source: "C1", target: "BASE", amount: 2.0, interest: 0.0)
+
+        XCTAssertEqual(convertationResult, 2)
     }
 
     func test_currencyConverter_convertConvertWithViaBase() throws {
-        let mockRates = mockRates()
+        let mockRates = mockRates(source: 1, targetRate: 2)
         let interest: Decimal = 0.0
         let amount: Decimal = 2.0
         let dataSource = ExchangeRateRepositoryMock(values: mockRates)
 
         let sut = CurrencyConverter(dataSource: dataSource, baseCurrency: "BASE")
         let convertationResult = try sut.convert(source: "C1", target: "C2", amount: amount, interest: interest)
-        let expectedRate: Decimal = (1 / 1.2) * 0.4
+        let expectedRate: Decimal = 2
         let expectedResult: Decimal = amount * expectedRate
 
         XCTAssertEqual(convertationResult, expectedResult)
@@ -57,7 +67,7 @@ class CurrencyConverterTests: XCTestCase {
     }
 
     func test_currencyConverter_convertConvertCrossRateWithInterest() throws {
-        let mockRates = mockRates()
+        let mockRates = mockRates(source: 1, targetRate: 2)
         let interest: Decimal = 0.0
         let amount: Decimal = 2.0
         let dataSource = ExchangeRateRepositoryMock(values: mockRates)
@@ -65,22 +75,27 @@ class CurrencyConverterTests: XCTestCase {
         let sut = CurrencyConverter(dataSource: dataSource, baseCurrency: "BASE")
         let convertationResult = try sut.convert(source: "C1", target: "C2", amount: amount, interest: interest)
 
-        let expectedRate: Decimal = (1 / 1.2) * 0.4
+        let expectedRate: Decimal = 2
         let expectedResult: Decimal = amount * expectedRate + ( amount * expectedRate * interest/100)
         XCTAssertEqual(convertationResult, expectedResult)
     }
 
-    private func mockRates() -> [ExchangeRate] {
+    private func mockRates(source: Decimal, targetRate: Decimal) -> [ExchangeRate] {
         [
             ExchangeRate(
                 source: .init(code: "BASE"),
                 target: .init(code: "C1"),
-                rateValue: 1.2
+                rateValue: source
             ),
             ExchangeRate(
                 source: .init(code: "BASE"),
                 target: .init(code: "C2"),
-                rateValue: 0.4
+                rateValue: targetRate
+            ),
+            ExchangeRate(
+                source: .init(code: "BASE"),
+                target: .init(code: "BASE"),
+                rateValue: 1
             )
         ]
     }
