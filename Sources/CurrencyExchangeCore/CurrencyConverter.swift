@@ -12,6 +12,11 @@ public enum CurrencyConverterError: Error {
 }
 
 public struct CurrencyConverter {
+    enum InterstMode {
+        case subsctract
+        case add
+    }
+
     private let baseCurrency: String
     private let dataSource: ExchangeRateDataSource
     private let convertationModel: ConvertationModel
@@ -47,6 +52,16 @@ public struct CurrencyConverter {
         amount: Decimal,
         interest: Decimal
     ) throws -> Decimal {
+        let convrtationDescription = ConvertationDescription(
+            exchangeRate: try getExchangeRate(source: source, target: target),
+            originalAmount: amount,
+            interest: interest
+        )
+
+        return try convertationModel.execute(convertation: convrtationDescription)
+    }
+
+    public func getExchangeRate(source: String, target: String) throws -> ExchangeRate {
         guard let sourcePair = try dataSource.retrieve(pair: "\(baseCurrency)\(source)") else {
             throw CurrencyConverterError.dataSourceDoesNotContain("\(baseCurrency)\(source)")
         }
@@ -56,16 +71,7 @@ public struct CurrencyConverter {
         }
 
         let crossRateCalculator = CrossRateCalculatorImpl(sourcePair: sourcePair, targetPair: targetPair)
-        let convrtationDescription = ConvertationDescription(
-            exchangeRate: crossRateCalculator.exchangeRate(),
-            originalAmount: amount,
-            interest: interest
-        )
 
-        return try convertationModel.execute(convertation: convrtationDescription)
-    }
-
-    public func getExchangeRate(source: String, target: String) throws -> ExchangeRate {
-        fatalError("message")
+        return crossRateCalculator.exchangeRate()
     }
 }
