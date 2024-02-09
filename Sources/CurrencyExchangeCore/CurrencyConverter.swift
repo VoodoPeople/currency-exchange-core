@@ -25,7 +25,7 @@ public struct CurrencyConverter {
         self.convertationModel = ConvertationModelImpl()
     }
 
-    func convert(source: String, target: String, amount: Decimal, interest: Decimal) throws -> Decimal {
+    public func convert(source: String, target: String, amount: Decimal, interest: Decimal) throws -> Decimal {
         if let pairRate = try dataSource.retrieve(pair: "\(source)\(target)") {
             let convrtationDescription = ConvertationDescription(
                 exchangeRate: pairRate,

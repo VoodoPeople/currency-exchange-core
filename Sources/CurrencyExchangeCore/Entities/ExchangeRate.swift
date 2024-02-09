@@ -16,7 +16,7 @@ public struct ExchangeRate {
         "\(source.code)\(target.code)"
     }
 
-    init(source: Currency, target: Currency, rateValue: Decimal) {
+    public init(source: Currency, target: Currency, rateValue: Decimal) {
         self.source = source
         self.target = target
         self.rateValue = rateValue
