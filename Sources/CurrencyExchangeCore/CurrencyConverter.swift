@@ -31,37 +31,26 @@ public struct CurrencyConverter {
     }
 
     public func convert(source: String, target: String, amount: Decimal, interest: Decimal) throws -> Decimal {
-        if source != baseCurrency {
-            return try calculateAsCrossCurrency(source: source, target: target, amount: amount, interest: interest)
-        }
-
-        if target != baseCurrency, let pairRate = try dataSource.retrieve(pair: "\(baseCurrency)\(target)") {
-            let convrtationDescription = ConvertationDescription(
-                exchangeRate: pairRate,
-                originalAmount: amount,
-                interest: interest
-            )
-            return try convertationModel.execute(convertation: convrtationDescription)
-        }
-        return try calculateAsCrossCurrency(source: source, target: target, amount: amount, interest: interest)
-    }
-
-    private func calculateAsCrossCurrency(
-        source: String,
-        target: String,
-        amount: Decimal,
-        interest: Decimal
-    ) throws -> Decimal {
+        let exchangeRate = try getExchangeRate(source: source, target: target)
         let convrtationDescription = ConvertationDescription(
-            exchangeRate: try getExchangeRate(source: source, target: target),
+            exchangeRate: exchangeRate,
             originalAmount: amount,
             interest: interest
         )
-
         return try convertationModel.execute(convertation: convrtationDescription)
     }
 
     public func getExchangeRate(source: String, target: String) throws -> ExchangeRate {
+        if source != baseCurrency {
+            return try crossCurrencyRate(source: source, target: target)
+        } else if target != baseCurrency,
+                  let pairRate = try dataSource.retrieve(pair: "\(baseCurrency)\(target)") {
+            return pairRate
+        }
+        return try crossCurrencyRate(source: source, target: target)
+    }
+
+    private func crossCurrencyRate(source: String, target: String) throws -> ExchangeRate {
         guard let sourcePair = try dataSource.retrieve(pair: "\(baseCurrency)\(source)") else {
             throw CurrencyConverterError.dataSourceDoesNotContain("\(baseCurrency)\(source)")
         }
