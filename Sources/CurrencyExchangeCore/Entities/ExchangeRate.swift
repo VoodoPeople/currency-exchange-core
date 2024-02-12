@@ -8,8 +8,8 @@
 import Foundation
 
 public struct ExchangeRate {
-    let source: Currency
-    let target: Currency
+    public let source: Currency
+    public let target: Currency
     public let rateValue: Decimal
 
     var pair: String {
